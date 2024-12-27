@@ -1,0 +1,7 @@
+*.o
+
+*vnix
+compile_commands.json
+
+cross/
+.cache/
