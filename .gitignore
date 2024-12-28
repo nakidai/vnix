@@ -1,6 +1,6 @@
 *.o
 
-*vnix
+vmvnix
 compile_commands.json
 
 cross/

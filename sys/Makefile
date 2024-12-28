@@ -17,15 +17,15 @@ S_OBJECTS = $(S_SOURCE:.s=.o)
 OBJECTS = $(C_OBJECTS) $(S_OBJECTS) arch.o libk.o
 
 .PHONY: all
-all: vnix
+all: vmvnix
 
 .PHONY: clean
 clean:
-	$(RM) $(OBJECTS) kernel.elf
+	$(RM) $(OBJECTS) vmvnix
 	$(MAKE) -C arch clean
 	$(MAKE) -C libk clean
 
-vnix: $(OBJECTS)
+vmvnix: $(OBJECTS)
 	$(LD) -n -T arch/$(ARCH)/linker.ld -o $@ $(OBJECTS) $(LDFLAGS)
 
 arch.o:

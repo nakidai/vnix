@@ -2,13 +2,13 @@ ROOT = .
 include $(ROOT)/config.mk
 
 .PHONY: kernel
-kernel: vnix
+kernel: vmvnix
 
 .PHONY: kernel_clean
 kernel_clean:
-	$(RM) vnix
+	$(RM) vmvnix
 	$(MAKE) -C sys clean
 
-vnix:
+vmvnix:
 	$(MAKE) -C sys
-	cp sys/vnix .
+	cp sys/vmvnix .
