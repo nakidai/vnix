@@ -27,6 +27,7 @@
 
 create_isr 8
 create_isr 13
+create_isr 14
 
 .macro pop_regs
 	popl %gs 

@@ -31,6 +31,7 @@ extern void idt_flush(uint32_t);
 
 extern void isr8();
 extern void isr13();
+extern void isr14();
 
 void idt_init(void)
 {
@@ -52,6 +53,7 @@ void idt_init(void)
 
 	set_entry(8, (uint32_t) (uint64_t) isr8, 0x08, 0x8e);
 	set_entry(13, (uint32_t) (uint64_t) isr13, 0x08, 0x8e);
+	set_entry(14, (uint32_t) (uint64_t) isr14, 0x08, 0x0e);
 
 	idt_flush((uint32_t) (uint64_t) &idt_entries);
 }
