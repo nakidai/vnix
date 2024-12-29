@@ -14,6 +14,7 @@ SOURCE_C = asm.c \
 	   isr.c \
 	   tss.c \
 	   vmm.c \
+	   cpu_flags.c \
 	   main.c
 
 CPPFLAGS += -I include -I $(ROOT)/sys/include
