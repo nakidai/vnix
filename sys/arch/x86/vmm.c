@@ -1,9 +1,12 @@
 #include <stddef.h>
 #include <stdbool.h>
+#include <stdint.h>
 
 #include <libk/kstdmem.h>
 
-#include <stdint.h>
+#include <arch/cpu_flags.h>
+#include <arch/asm.h>
+
 #include <vnix/vmm.h>
 #include <vnix/kerneldef.h>
 #include <vnix/mem_table.h>
@@ -117,5 +120,10 @@ void vmm_set_vmm_context(void* page_dir)
 {
 	context = page_dir;
 
-	// TODO: write code for loading page directory
+	struct cr0_flags cr0_flags = get_cr0_flags();
+	cr0_flags.pg = true;
+	cr0_flags.pe = true;
+	set_cr0_flags(cr0_flags);
+
+	set_cr3((uint32_t) page_dir);
 }
