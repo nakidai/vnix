@@ -1,165 +1,121 @@
 #include <stddef.h>
-#include <stdint.h>
+#include <stdbool.h>
 
 #include <libk/kstdmem.h>
 
+#include <stdint.h>
 #include <vnix/vmm.h>
-#include <vnix/heap.h>
+#include <vnix/kerneldef.h>
+#include <vnix/mem_table.h>
 
-static uint32_t* page_dir = (uint32_t*) VMM_PAGE_DIR;
-static uint8_t page_frame_bitmap[VMM_PAGE_AREA_SIZE / 8];
+#define VMM_PAGE_DIR_ENTRY_COUNT 0x100000
 
-static size_t page_count = 0;
+#define VMM_ENTFLAG_USER 0
+#define VMM_ENTFLAG_SUPERVISOR 1
 
-void vmm_init(uint32_t mem_kb)
+#define VMM_ENTFLAG_4K_PAGE 0
+#define VMM_ENTFLAG_4M_PAGE 1
+
+struct dir_entry {
+	unsigned int present         : 1;
+	unsigned int read_write      : 1;
+	unsigned int user_supervisor : 1;
+	unsigned int pwt             : 1;
+	unsigned int pcd             : 1;
+	unsigned int accessed        : 1;
+	unsigned int avalidable0     : 1;
+	unsigned int page_size       : 1;
+	unsigned int avalidable1     : 4;
+	unsigned int addr            : 20;
+} attr_packed;
+
+static struct dir_entry* context;
+
+void vmm_init(uint32_t mem)
 {
-	page_count = (mem_kb * 1024) / VMM_PAGE_SIZE;
+	struct dir_entry* kernel_page_dir = (void*) MEM_KERNEL_PAGE_START;
 
-	for (size_t i = 0; i < page_count; i++)
-		page_frame_bitmap[i] = 0;
-
-	for (size_t i = page_count / 8; i < VMM_PAGE_AREA_SIZE / 8; i++)
-		page_frame_bitmap[i] = 0xff;
-
-	for (size_t i = vmm_page_from_addr(0x0); i < vmm_page_from_addr(VMM_KERNEL_RESERVED); i++)
-		vmm_page_set_used(page_frame_bitmap, i);
-
-	for (size_t i = 0; i < 4; i++)
-		page_frame_bitmap[i] = (i * VMM_PAGE_SIZE_4M | (VMM_PG_PRESENT | VMM_PG_WRITE | VMM_PG_4M));
-
-	for (size_t i = 4; i < 1024; i++)
-		page_frame_bitmap[i] = 0;
-
-	page_frame_bitmap[1023] = page_count | VMM_PG_PRESENT | VMM_PG_WRITE;
-
-	kmemset((void*) VMM_PD_AREA_START, 0, VMM_PD_AREA_END - VMM_PD_AREA_START);
-
-	asm(
-			"mov %0, %%eax\n"
-			"mov %%eax, %%cr3\n"
-			"mov %%cr4, %%eax\n"
-			"or %2, %%eax\n"
-			"mov %%eax, %%cr4\n"
-			"mov %%cr0, %%eax\n"
-			"or %1, %%eax\n"
-			"mov %%eax, %%cr0\n"
-			::
-			"m"(page_dir),
-			"i"(VMM_PAGING_FLAG),
-			"i"(VMM_PSE_FLAG)
-	);
-
-	heap_init();
+	vmm_create_page_dir(kernel_page_dir, mem);
+	vmm_set_vmm_context(kernel_page_dir);
 }
 
-uint32_t vmm_acquire_page(void)
+void vmm_create_page_dir(void* _dir, uint32_t mem)
 {
-	uint32_t page = -1;
+	struct dir_entry* dir = (struct dir_entry*) _dir;
+	struct dir_entry* entry;
 
-	for (size_t byte = 0; byte < VMM_PAGE_AREA_SIZE; byte++) {
-		if (page_frame_bitmap[byte] == 0xff)
-			continue;
+	for (size_t i = 0; i < vmm_get_page_by_addr(MEM_END_RESERVED); i++) {
+		entry = &dir[i];
 
-		for (uint8_t bit; bit < 8; bit++) {
-			page = 8 * page + bit;
-			vmm_page_set_used(page_frame_bitmap, page);
-
-			return page * VMM_PAGE_SIZE;
-		}
+		entry->read_write      = false;
+		entry->user_supervisor = VMM_ENTFLAG_SUPERVISOR;
+		entry->pwt             = false;
+		entry->pcd             = false;
+		entry->accessed        = true;
+		entry->avalidable0     = false;
+		entry->page_size       = VMM_ENTFLAG_4K_PAGE;
+		entry->avalidable1     = false;
+		entry->addr            = vmm_get_addr_by_page(i);
 	}
 
-	return -1;
+	for (size_t i = vmm_get_page_by_addr(MEM_END_RESERVED); i < VMM_PAGE_DIR_ENTRY_COUNT; i++) {
+		entry = &dir[i];
+
+		entry->read_write      = false;
+		entry->user_supervisor = VMM_ENTFLAG_SUPERVISOR;
+		entry->pwt             = false;
+		entry->pcd             = false;
+		entry->accessed        = false;
+		entry->avalidable0     = false;
+		entry->page_size       = VMM_ENTFLAG_4K_PAGE;
+		entry->avalidable1     = false;
+		entry->addr            = vmm_get_addr_by_page(i);
+	}
+
+	for (size_t i = vmm_get_page_by_addr(mem) - 1; i < VMM_PAGE_DIR_ENTRY_COUNT; i++) {
+		entry = &dir[i];
+
+		entry->present = false;
+	}
 }
 
-static uint32_t read_cr3(void);
-static void sync_all_from_kernel(void);
-
-bool vmm_add_page_to_pd(void* v_addr, uint32_t p_addr, int flags)
+void* vmm_alloc_page(uint32_t page_num)
 {
-	int pd_index = (((uint32_t) v_addr) >> 22);
-	int pt_index = (((uint32_t) v_addr) >> 12) & 0x03ff;
+	struct dir_entry* entry = &context[page_num];
 
-	uint32_t* pd = (uint32_t*) 0xfffff000;
-	uint32_t* pt = ((uint32_t*) 0xffc00000) + (0x400 + pd_index);
+	entry->accessed = true;
 
-	uint32_t cr3 = 0;
-
-	if (v_addr < (void*) HEAP_END) {
-		cr3 = read_cr3();
-		asm(
-			"mov %0, %%eax\n"
-			"mov %%eax, %%cr3\n"
-			::
-			"m"(pd)
-		);
-	}
-
-	if ((pd[pd_index] & VMM_PG_PRESENT) != VMM_PG_PRESENT) {
-		uint32_t phys_table = vmm_acquire_page();
-		pd[pd_index] = phys_table | (flags & 0xfff) | (VMM_PG_PRESENT | VMM_PG_WRITE);
-
-		asm(
-			"invlpg %0\n"
-			::
-			"m"(v_addr)
-		);
-
-		for (size_t i = 0; i < 1024; i++)
-			pt[i] = 0;
-	}
-
-	if ((pt[pt_index] & VMM_PG_PRESENT) == VMM_PG_PRESENT) {
-		if (cr3 != 0)
-			asm(
-				"mov %0, %%eax\n"
-				"mov %%eax, %%cr3\n"
-				::
-				"m"(pd)
-			);
-
-		return false;
-	}
-
-	pt[pt_index] = p_addr | (flags & 0xfff) | (VMM_PG_PRESENT | VMM_PG_WRITE);
-
-	asm(
-		"invlpg %0\n"
-		::
-		"m"(v_addr)
-	);
-
-	if (cr3 != 0)
-		asm(
-			"mov %0, %%eax\n"
-			"mov %%eax, %%cr3\n"
-			::
-			"m"(pd)
-		);
-
-	if (v_addr < (void*) HEAP_END)
-		sync_all_from_kernel();
-
-	return true;
+	return (void*) vmm_get_addr_by_page(page_num);
 }
 
-static uint32_t read_cr3(void)
+void vmm_dealloc_page(uint32_t page_num)
 {
-	uint32_t value;
-	asm volatile(
-		"mov %%cr3, %0\n"
-		:
-		"=r" (value)
-	);
+	struct dir_entry* entry = &context[page_num];
 
-	return value;
+	entry->accessed = false;
 }
 
-static void sync_all_from_kernel(void)
+void vmm_map_page(uint32_t page_num, bool read_write, bool user_supervisor, bool present)
 {
-	for (uint32_t addr = VMM_PD_AREA_START; addr < VMM_PD_AREA_END; addr += VMM_PAGE_SIZE) {
-		uint32_t* pd = (uint32_t*) addr;
+	struct dir_entry* entry = &context[page_num];
 
-		if ((void*) *pd != NULL) for (size_t i = 0; i < VMM_KERNEL_PAGE_COUNT; i++)
-			pd[i] = page_dir[i] & ~VMM_PG_OWNED;
+	entry->read_write      = read_write;
+	entry->user_supervisor = user_supervisor;
+	entry->present         = present;
+}
+
+void vmm_create_link(uint32_t start_page, uint32_t count, void* new_addr)
+{
+	for (size_t i = 0; i < count; i++) {
+		struct dir_entry* entry = &context[start_page + i];
+
+		entry->addr = (uint32_t) new_addr + VMM_PAGE_SIZE * i;
 	}
+}
+
+void vmm_set_vmm_context(void* page_dir)
+{
+	context = page_dir;
+
+	// TODO: write code for loading page directory
 }

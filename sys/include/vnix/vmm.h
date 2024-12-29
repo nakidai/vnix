@@ -4,32 +4,31 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#define VMM_PAGE_DIR 0x1000
-#define VMM_PAGE_AREA_SIZE 0x100000
-#define VMM_KERNEL_RESERVED 0x01000000
-#define VMM_KERNEL_PAGE_COUNT 256
+#include <vnix/mem_table.h>
 
-#define VMM_PAGE_SIZE 0x00001000
-#define VMM_PAGE_SIZE_4M 0x00400000
+#define VMM_ENTFLAG_USER 0
+#define VMM_ENTFLAG_SUPERVISOR 1
 
-#define VMM_PG_PRESENT 0x1
-#define VMM_PG_WRITE 0x2
-#define VMM_PG_USER 0x4
-#define VMM_PG_OWNED 0x200
-#define VMM_PG_4M 0x80
+#define VMM_ENTFLAG_4K_PAGE 0
+#define VMM_ENTFLAG_4M_PAGE 1
 
-#define VMM_PD_AREA_START 0x00C00000
-#define VMM_PD_AREA_END 0x01000000
+#define VMM_ENTFLAG_READ 0
+#define VMM_ENTFLAG_WRITE 1
 
-#define VMM_PAGING_FLAG 0x80000000
-#define VMM_PSE_FLAG 0x10
+#define VMM_PAGE_SIZE kb(4)
 
-#define vmm_page_from_addr(x) ((x) >> 12)
-#define vmm_page_set_used(m, i) m[((uint32_t) i) / 8] |= (1 << (((uint32_t) i) % 8))
+#define vmm_get_page_by_addr(addr) (addr >> 12)
+#define vmm_get_addr_by_page(page) (page << 12)
 
-void vmm_init(uint32_t mem_kb);
+void vmm_init(uint32_t mem);
 
-uint32_t vmm_acquire_page(void);
-bool vmm_add_page_to_pd(void* v_addr, uint32_t p_addr, int flags);
+void vmm_set_vmm_context(void* page_dir);
+
+void* vmm_alloc_page(uint32_t page_num);
+void vmm_dealloc_page(uint32_t page_num);
+void vmm_create_link(uint32_t start_page, uint32_t count, void* new_addr);
+void vmm_map_page(uint32_t page_num, bool read_write, bool user_supervisor, bool present);
+
+void vmm_create_page_dir(void* dir, uint32_t mem);
 
 #endif
