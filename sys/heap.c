@@ -42,7 +42,7 @@ void* kmalloc(size_t size)
 	entry->owner_id = 0; // TODO: 0 is system owner id, change it to process id
 	
 	void* addr = (void*) MEM_HEAP_START;
-	for (int i = 0; i < allocs_info_count; i++) {
+	for (int i = 0; i < allocs_info_count - 1; i++) {
 		struct alloc_entry* entry = &allocs_entries[-i];
 
 		if (entry->addr == 0)
@@ -55,6 +55,8 @@ void* kmalloc(size_t size)
 		vmm_alloc_page(vmm_get_page_by_addr(MEM_HEAP_START) + allocs_data_pages_count);
 		allocs_data_pages_count++;
 	}
+
+	entry->addr = (uint32_t) addr;
 
 	return addr;
 }
