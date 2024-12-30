@@ -3,8 +3,9 @@
 
 #include <stdint.h>
 
-void vga_put(const char* str);
-void vga_put_pos(const char* str, uint32_t x, uint32_t y);
-void vga_put_colored(const char* str, uint32_t x, uint32_t y, uint8_t color);
+void vga_init_term(uint32_t size);
+void vga_init(uint32_t size);
+
+void vga_clear(void);
 
 #endif

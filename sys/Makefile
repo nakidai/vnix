@@ -6,6 +6,8 @@ CPPFLAGS += -I include
 C_SOURCE = main.c \
 	   arch_faluts.c \
 	   gfx.c \
+	   kio.c \
+	   panic.c \
 	   vga.c
 
 C_OBJECTS = $(C_SOURCE:.c=.o)

@@ -59,6 +59,7 @@ void vmm_create_page_dir(void* _dir, uint32_t mem)
 		entry->page_size       = VMM_ENTFLAG_4K_PAGE;
 		entry->avalidable1     = false;
 		entry->addr            = vmm_get_addr_by_page(i);
+		entry->present         = true;
 	}
 
 	for (size_t i = vmm_get_page_by_addr(MEM_END_RESERVED); i < VMM_PAGE_DIR_ENTRY_COUNT; i++) {
@@ -73,6 +74,7 @@ void vmm_create_page_dir(void* _dir, uint32_t mem)
 		entry->page_size       = VMM_ENTFLAG_4K_PAGE;
 		entry->avalidable1     = false;
 		entry->addr            = vmm_get_addr_by_page(i);
+		entry->present         = true;
 	}
 
 	for (size_t i = vmm_get_page_by_addr(mem) - 1; i < VMM_PAGE_DIR_ENTRY_COUNT; i++) {

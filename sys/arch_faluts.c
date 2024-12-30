@@ -4,7 +4,6 @@
 
 void falut_double_falut(void* _)
 {
-	vga_put("Double falut!");
 	halt();
 }
 
