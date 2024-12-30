@@ -4,7 +4,8 @@ include $(ROOT)/config.mk
 CPPFLAGS += -I $(ROOT)/sys/include
 
 SOURCE_C = kstdmem.c \
-	   itoa.c
+	   itoa.c \
+	   kstring.c
 
 OBJECTS = $(SOURCE_C:.c=.o)
 

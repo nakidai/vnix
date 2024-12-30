@@ -5,6 +5,7 @@
 #include <vnix/mem_table.h>
 #include <vnix/kio.h>
 #include <vnix/heap.h>
+#include <vnix/fs.h>
 
 void kernel_entry(struct multiboot* args)
 {
@@ -14,6 +15,9 @@ void kernel_entry(struct multiboot* args)
 
 	kputs("Base initing complete!\n");
 	kputs("Kernel build at " __DATE__ " " __TIME__ ".\n");
+
+	kputs("Initing fs...");
+	fs_init();
 
 	halt();
 }
