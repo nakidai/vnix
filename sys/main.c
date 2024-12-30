@@ -12,7 +12,8 @@ void kernel_entry(struct multiboot* args)
 	heap_init(vmm_get_page_by_addr(args->mem_upper * 1024) - 1);
 	kok();
 
-	void* mem = kmalloc(100);
+	kputs("Base initing complete!\n");
+	kputs("Kernel build at " __DATE__ " " __TIME__ ".\n");
 
 	halt();
 }

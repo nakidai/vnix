@@ -9,12 +9,20 @@
 #include <vnix/vga.h>
 #include <vnix/kio.h>
 
+#include <libk/itoa.h>
+
 extern void kernel_entry(struct multiboot* header);
 
 void arch_entry(struct multiboot* header)
 {
 	vga_init_term(80);
 	kputs("Booting vnix.\n");
+
+	char num[128] = {0};
+	kitoa(header->mem_upper * 1024, num, 10);
+	kputs("Avalidabe ");
+	kputs(num);
+	kputs(" bytes memory.\n");
 
 	kputs("Initing TSS...");
 	tss_init();
