@@ -2,8 +2,7 @@ ROOT = ../../../..
 include $(ROOT)/config.mk
 
 SOURCE_S = start.s \
-	   stack.s \
-	   multiboot.s
+	   multiboot.s \
 
 OBJECTS = $(SOURCE_S:.s=.o)
 

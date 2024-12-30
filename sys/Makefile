@@ -6,7 +6,7 @@ CPPFLAGS += -I include
 C_SOURCE = main.c \
 	   arch_faluts.c \
 	   gfx.c \
-	   heap.c \
+	   vga.c
 
 C_OBJECTS = $(C_SOURCE:.c=.o)
 
@@ -14,7 +14,7 @@ S_SOURCE =
 
 S_OBJECTS = $(S_SOURCE:.s=.o)
 
-OBJECTS = $(C_OBJECTS) $(S_OBJECTS) arch.o libk.o
+OBJECTS = arch.o $(C_OBJECTS) $(S_OBJECTS) libk.o
 
 .PHONY: all
 all: vmvnix

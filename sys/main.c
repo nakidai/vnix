@@ -3,7 +3,7 @@
 #include <vnix/interrput.h>
 #include <vnix/vmm.h>
 
-void kmain(struct multiboot* args)
+void kernel_entry(struct multiboot* args)
 {
 	halt();
 }

@@ -19,7 +19,7 @@ SOURCE_C = asm.c \
 
 CPPFLAGS += -I include -I $(ROOT)/sys/include
 
-OBJECTS = $(SOURCE_S:.s=.o) $(SOURCE_C:.c=.o) boot.o
+OBJECTS = boot.o $(SOURCE_S:.s=.o) $(SOURCE_C:.c=.o)
 
 .PHONY: all
 all: arch.o

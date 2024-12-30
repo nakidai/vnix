@@ -11,7 +11,7 @@ LD = $(BIN)/$(TOOL_NAME_PREFIX)ld
 RM = rm -rf
 CP = cp
 
-ASFLAGS  = --32
+ASFLAGS  = --32 -g
 LDFLAGS  = -melf_i386
 CFLAGS   = -nostdlib -nodefaultlibs -g
 CPPFLAGS = -I $(ROOT)/include

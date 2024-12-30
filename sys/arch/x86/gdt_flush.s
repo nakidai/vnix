@@ -13,7 +13,7 @@ gdt_flush:
 
 	movl .flush, %eax
 	add $0x08, %eax
-	jmpl %eax
+	jmpl *%eax
 
 	.flush:
 		ret

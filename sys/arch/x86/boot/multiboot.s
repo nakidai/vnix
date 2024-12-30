@@ -1,4 +1,10 @@
+.globl _start
+.extern start
+
 .section .multiboot_header
+_start:
+	jmp start
+
 multiboot_header_start:
 	.align 4
 
@@ -12,10 +18,10 @@ multiboot_header_start:
 	.long 0
 	.long 0
 
-	.long 0
+	.long 1
 
-	.long 1024
-	.long 768
-	.long 32
+	.long 640
+	.long 480
+	.long 16
 
 multiboot_header_end:
