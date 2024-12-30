@@ -4,38 +4,84 @@
 #include <vnix/heap.h>
 #include <vnix/vmm.h>
 #include <vnix/halt.h>
+#include <vnix/kerneldef.h>
+#include <vnix/mem_table.h>
 
-static void* heap = NULL;
+#define ALLOC_INFO_COUNT_IN_PAGE VMM_PAGE_SIZE / sizeof(struct alloc_entry)
 
-void heap_init(void)
+struct alloc_entry {
+	uint32_t owner_id;
+	uint32_t addr;
+	uint32_t size;
+
+	uint32_t _pad;
+} attr_packed;
+
+static struct alloc_entry* allocs_entries = NULL;
+static size_t allocs_page                 = 0;
+static size_t allocs_pages_count          = 0;
+static size_t allocs_info_count           = 0;
+
+static size_t allocs_data_pages_count = 0;
+
+static struct alloc_entry* add_alloc_info(void);
+
+void heap_init(uint32_t last_page)
 {
-	heap = (void*) HEAP_START;
-	heap_ksbrk_page(1);
+	allocs_entries = (void*) vmm_get_addr_by_page(last_page);
+	allocs_page    = last_page;
 }
 
-void* heap_ksbrk_page(size_t _i)
+void* kmalloc(size_t size)
 {
-	struct heap_malloc_header* header;
-	uint32_t addr;
+	if (size == 0)
+		return NULL;
+
+	struct alloc_entry* entry = add_alloc_info();
+	entry->size     = size;
+	entry->owner_id = 0; // TODO: 0 is system owner id, change it to process id
 	
-	if (heap + (_i * VMM_PAGE_SIZE) > (void*) HEAP_END)
-		return (void*) -1;
+	void* addr = (void*) MEM_HEAP_START;
+	for (int i = 0; i < allocs_info_count; i++) {
+		struct alloc_entry* entry = &allocs_entries[-i];
 
-	header = (struct heap_malloc_header*) heap;
+		if (entry->addr == 0)
+			continue;
 
-	for (size_t i = 0; i < _i; i++) {
-		addr = vmm_acquire_page();
-
-		if ((int) addr < 0)
-			halt();
-
-		vmm_add_page_to_pd(heap, addr, 0);
-
-		heap += VMM_PAGE_SIZE;
+		addr += entry->size;
 	}
 
-	header->size = VMM_PAGE_SIZE * _i;
-	header->used = 0;
+	if (vmm_get_page_by_addr(((uint32_t) addr - MEM_HEAP_START)) >= allocs_data_pages_count) {
+		vmm_alloc_page(vmm_get_page_by_addr(MEM_HEAP_START) + allocs_data_pages_count);
+		allocs_data_pages_count++;
+	}
 
-	return header;
+	return addr;
+}
+
+void kfree(void* mem)
+{
+	// TODO: ignre, write later
+}
+
+static struct alloc_entry* add_alloc_info(void)
+{
+	for (int i = 0; i < allocs_info_count; i++) {
+		struct alloc_entry* entry = &allocs_entries[-i];
+
+		if (entry->addr == 0)
+			return entry;
+	}
+
+	if (allocs_info_count - (allocs_pages_count *
+				ALLOC_INFO_COUNT_IN_PAGE) >= ALLOC_INFO_COUNT_IN_PAGE) {
+		allocs_page--;
+		allocs_pages_count++;
+		vmm_alloc_page(allocs_page);
+	}
+
+	allocs_info_count++;
+	return &allocs_entries[-allocs_info_count];
+
+	// TODO: deleate pages from alloc info
 }

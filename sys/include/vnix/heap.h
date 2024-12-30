@@ -1,18 +1,12 @@
 #ifndef _vnix_heap_h
 #define _vnix_heap_h
 
+#include <stdint.h>
 #include <stddef.h>
 
-#define HEAP_START 0x2000000
-#define HEAP_END 0x40000000
+void heap_init(uint32_t last_page);
 
-struct heap_malloc_header {
-	unsigned long size:31;
-	unsigned long used:1;
-};
-
-void heap_init(void);
-
-void* heap_ksbrk_page(size_t i);
+void* kmalloc(size_t size);
+void kfree(void* mem);
 
 #endif
