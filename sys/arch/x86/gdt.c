@@ -47,7 +47,7 @@ void gdt_init(void)
 	set_entry(6, 0, 0xffffffff, 0x80, 0xcf);
 
 	gdt_flush((uint32_t) (uint64_t) &gdt_ptr);
-	tss_flush();
+	//tss_flush();
 }
 
 static void set_entry(size_t i, uint32_t base, uint32_t limit, uint8_t access, uint8_t granularity)
