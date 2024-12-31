@@ -13,7 +13,7 @@
 
 /*
 	AUTHOR: gimura2022 <gimura0001@gmail.com>
-	DATE  : 31.12.2024
+	DATE  : 1.1.2025
 	FILE  : sys/arch/x86/vmm.c
 
 	virtual memory managament realisation for x86
@@ -24,6 +24,7 @@
 #include <stdint.h>
 
 #include <libk/kstdmem.h>
+#include <libk/itoa.h>
 
 #include <arch/cpu_flags.h>
 #include <arch/asm.h>
@@ -31,6 +32,7 @@
 #include <vnix/vmm.h>
 #include <vnix/kerneldef.h>
 #include <vnix/mem_table.h>
+#include <vnix/kio.h>
 
 static struct vmm_dir_entry* context;
 
@@ -38,6 +40,11 @@ void vmm_init(uint32_t mem)
 {
 	struct vmm_dir_entry* kernel_page_dir = (void*) MEM_KERNEL_PAGE_START;
 	struct vmm_dir_entry* entry;
+	char tmp[128];
+
+	kputs("mark ");
+	kputs(kitoa(vmm_get_page_by_addr(MEM_END_RESERVED), tmp, 10));
+	kputs(" as kernel...");
 
 	for (size_t i = 0; i < vmm_get_page_by_addr(MEM_END_RESERVED); i++) {
 		entry = &kernel_page_dir[i];
@@ -53,6 +60,10 @@ void vmm_init(uint32_t mem)
 		entry->addr            = vmm_get_addr_by_page(i);
 		entry->present         = true;
 	}
+
+	kputs("mark ");
+	kputs(kitoa(VMM_PAGE_DIR_ENTRY_COUNT - vmm_get_page_by_addr(MEM_END_RESERVED), tmp, 10));
+	kputs(" as free memory...");
 
 	for (size_t i = vmm_get_page_by_addr(MEM_END_RESERVED); i < VMM_PAGE_DIR_ENTRY_COUNT; i++) {
 		entry = &kernel_page_dir[i];
