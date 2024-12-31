@@ -1,0 +1,9 @@
+kernel:
+- fix vmm
+- write owned vmm
+- fix allocator (heap.c)
+- write devices
+- write fat32 driver
+- write elf parser
+- write multithreading
+- write syscalls
