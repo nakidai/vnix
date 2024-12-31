@@ -67,12 +67,15 @@ void vmm_init(uint32_t mem)
 
 	for (size_t i = vmm_get_page_by_addr(MEM_END_RESERVED); i < VMM_PAGE_DIR_ENTRY_COUNT; i++) {
 		entry = &kernel_page_dir[i];
+
 		kmemset(entry, 0, sizeof(struct vmm_dir_entry));
+		entry->addr    = vmm_get_addr_by_page(i);
+		entry->present = true;
 	}
 
 	for (size_t i = vmm_get_page_by_addr(mem) - 1; i < VMM_PAGE_DIR_ENTRY_COUNT; i++) {
 		entry = &kernel_page_dir[i];
-		entry->present = false;
+		kmemset(entry, 0, sizeof(struct vmm_dir_entry));
 	}
 
 	vmm_set_vmm_context(kernel_page_dir);
