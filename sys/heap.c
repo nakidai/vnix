@@ -13,99 +13,114 @@
 
 /*
 	AUTHOR: gimura2022 <gimura0001@gmail.com>
-	DATE  : 31.12.2024
+	DATE  : 2.1.2025
 	FILE  : sys/heap.c
-	TODO  : rewrite this shit
 
 	hight level function for working in heap
 */
 
 #include <stddef.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 #include <vnix/heap.h>
-#include <vnix/vmm.h>
 #include <vnix/halt.h>
 #include <vnix/kerneldef.h>
 #include <vnix/mem_table.h>
 
-#define ALLOC_INFO_COUNT_IN_PAGE VMM_PAGE_SIZE / sizeof(struct alloc_entry)
+#include <libk/kstdmem.h>
+
+#define AREA_SIZE kb(4)
 
 struct alloc_entry {
-	uint32_t owner_id;
-	uint32_t addr;
-	uint32_t size;
+	uint32_t areas_count;
+	bool is_free;
+};
 
-	uint32_t _pad;
-} attr_packed;
+static struct alloc_entry alloc_entries[HEAP_MAX_ALLOC_ENTRIES];
+static size_t alloc_entries_count = 0;
 
-static struct alloc_entry* allocs_entries = NULL;
-static size_t allocs_page                 = 0;
-static size_t allocs_pages_count          = 0;
-static size_t allocs_info_count           = 0;
-
-static size_t allocs_data_pages_count = 0;
-
-static struct alloc_entry* add_alloc_info(void);
-
-void heap_init(uint32_t last_page)
+void heap_init(uint32_t mem_upper)
 {
-	allocs_entries = (void*) vmm_get_addr_by_page(last_page);
-	allocs_page    = last_page;
+	alloc_entries[alloc_entries_count++] = (struct alloc_entry) {
+		.areas_count = (mem_upper - MEM_HEAP_START) / AREA_SIZE,
+		.is_free     = true,
+	};
 }
+
+static struct alloc_entry* add_region(uint32_t areas);
+static void* get_entry_mem(struct alloc_entry* entry);
 
 void* kmalloc(size_t size)
 {
-	if (size == 0)
+	uint32_t areas            = size / AREA_SIZE + 1;
+	struct alloc_entry* entry = add_region(areas);
+
+	if (entry == NULL)
 		return NULL;
 
-	struct alloc_entry* entry = add_alloc_info();
-	entry->size     = size;
-	entry->owner_id = 0; // TODO: 0 is system owner id, change it to process id
-	
-	void* addr = (void*) MEM_HEAP_START;
-	for (int i = 0; i < allocs_info_count - 1; i++) {
-		struct alloc_entry* entry = &allocs_entries[-i];
+	entry->is_free = false;
 
-		if (entry->addr == 0)
-			continue;
-
-		addr += entry->size;
-	}
-
-	if (vmm_get_page_by_addr(((uint32_t) addr - MEM_HEAP_START)) >= allocs_data_pages_count) {
-		vmm_alloc_page(vmm_get_page_by_addr(MEM_HEAP_START) + allocs_data_pages_count);
-		allocs_data_pages_count++;
-	}
-
-	entry->addr = (uint32_t) addr;
-
-	return addr;
+	return get_entry_mem(entry);
 }
 
 void kfree(void* mem)
 {
-	// TODO: ignre, write later
+	if (mem < (void*) MEM_HEAP_START)
+		return;
+
+	for (int i = 0; i < alloc_entries_count; i++) {
+		struct alloc_entry* entry = &alloc_entries[i];
+
+		if (get_entry_mem(entry) == mem) {
+			entry->is_free = true;
+			return;
+		}
+	}
 }
 
-static struct alloc_entry* add_alloc_info(void)
+static struct alloc_entry* add_region(uint32_t areas)
 {
-	for (int i = 0; i < allocs_info_count; i++) {
-		struct alloc_entry* entry = &allocs_entries[-i];
+	struct alloc_entry* separing_entry = NULL;
+	struct alloc_entry* new_entry      = NULL;
+	int separing_entry_id              = 0;
 
-		if (entry->addr == 0)
-			return entry;
+	for (int i = 0; i < alloc_entries_count; i++) {
+		struct alloc_entry* entry = &alloc_entries[i];
+
+		if (entry->areas_count <= areas && entry->is_free) {
+			separing_entry    = entry;
+			separing_entry_id = i;
+
+			break;
+		}
 	}
 
-	if (allocs_info_count - (allocs_pages_count *
-				ALLOC_INFO_COUNT_IN_PAGE) >= ALLOC_INFO_COUNT_IN_PAGE) {
-		allocs_page--;
-		allocs_pages_count++;
-		vmm_alloc_page(allocs_page);
-	}
+	if (separing_entry == NULL)
+		return NULL;
 
-	allocs_info_count++;
-	return &allocs_entries[-allocs_info_count];
+	if (alloc_entries_count + 1 >= HEAP_MAX_ALLOC_ENTRIES)
+		return NULL;
 
-	// TODO: deleate pages from alloc info
+	kmemcpy(&alloc_entries[separing_entry_id + 1], &alloc_entries[separing_entry_id],
+			sizeof(struct alloc_entry) * (alloc_entries_count - separing_entry_id));
+
+	alloc_entries_count++;
+
+	separing_entry = &alloc_entries[separing_entry_id + 1];
+	new_entry      = &alloc_entries[separing_entry_id];
+
+	separing_entry->areas_count  -= areas;
+	new_entry->areas_count        = areas;
+
+	return new_entry;
+}
+
+static void* get_entry_mem(struct alloc_entry* entry)
+{
+	void* addr = (void*) MEM_HEAP_START;
+	for (struct alloc_entry* i = alloc_entries; i != entry; i = &i[1])
+		addr += i->areas_count * AREA_SIZE;
+
+	return addr;
 }

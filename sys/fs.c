@@ -13,7 +13,7 @@
 
 /*
 	AUTHOR: gimura2022 <gimura0001@gmail.com>
-	DATE  : 31.12.2024
+	DATE  : 2.1.2025
 	FILE  : sys/fs.c
 
 	file system realisation
@@ -36,6 +36,7 @@ void fs_init(void)
 {
 	kmemset(fses, 0, sizeof(fses));
 	root = rootfs_init();
+
 	kok();
 
 	if (!fs_mkdir(root, "dev", 0)) panic("Can't create /dev/ directory!\n");

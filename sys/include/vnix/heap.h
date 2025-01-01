@@ -13,7 +13,7 @@
 
 /*
 	AUTHOR: gimura2022 <gimura0001@gmail.com>
-	DATE  : 31.12.2024
+	DATE  : 2.1.2025
 	FILE  : sys/include/vnix/heap.h
 
 	hight level function for working in heap
@@ -22,10 +22,11 @@
 #ifndef _vnix_heap_h
 #define _vnix_heap_h
 
-#include <stdint.h>
 #include <stddef.h>
 
-void heap_init(uint32_t last_page);
+#define HEAP_MAX_ALLOC_ENTRIES 1024 * 16
+
+void heap_init(uint32_t mem_upper);
 
 void* kmalloc(size_t size);
 void kfree(void* mem);

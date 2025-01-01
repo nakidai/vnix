@@ -13,7 +13,7 @@
 
 /*
 	AUTHOR: gimura2022 <gimura0001@gmail.com>
-	DATE  : 1.1.2025
+	DATE  : 2.1.2025
 	FILE  : sys/main.c
 
 	main kernel file
@@ -29,7 +29,12 @@
 
 void kernel_entry(struct multiboot* args)
 {
-	
+	kputs("Heap initing...");
+	heap_init(kb(args->mem_upper));
+	kok();
+
+	kputs("Fs initing...");
+	fs_init();
 
 	kputs("Kernel build at " __DATE__ " " __TIME__ ".\n");
 	halt();

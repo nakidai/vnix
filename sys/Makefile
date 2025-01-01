@@ -8,6 +8,9 @@ C_SOURCE = main.c \
 	   kio.c \
 	   panic.c \
 	   vga.c \
+	   heap.c \
+	   fs.c \
+	   rootfs.c
 
 C_OBJECTS = $(C_SOURCE:.c=.o)
 
