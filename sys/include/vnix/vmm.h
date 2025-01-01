@@ -13,7 +13,7 @@
 
 /*
 	AUTHOR: gimura2022 <gimura0001@gmail.com>
-	DATE  : 31.12.2024
+	DATE  : 1.1.2025
 	FILE  : sys/include/vnix/vmm.h
 
 	virtual memory managament interface
