@@ -25,7 +25,6 @@
 #include <vnix/multiboot.h>
 #include <vnix/arch_faluts.h>
 #include <vnix/interrput.h>
-#include <vnix/vmm.h>
 #include <vnix/vga.h>
 #include <vnix/kio.h>
 
