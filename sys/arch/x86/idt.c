@@ -13,7 +13,7 @@
 
 /*
 	AUTHOR: gimura2022 <gimura0001@gmail.com>
-	DATE  : 31.12.2024
+	DATE  : 1.1.2025
 	FILE  : sys/arch/x86/idt.c
 
 	work with Interrput Descriptor Table
@@ -61,22 +61,11 @@ void idt_init(void)
 
 	kmemset(&idt_entries, 0, sizeof(struct idt_entry) * IDT_MAX_ENTRIES);
 
-	outb(0x20, 0x11);
-	outb(0xA0, 0x11);
-	outb(0x21, 0x20);
-	outb(0xA1, 0x28);
-	outb(0x21, 0x04);
-	outb(0xA1, 0x02);
-	outb(0x21, 0x01);
-	outb(0xA1, 0x01);
-	outb(0x21, 0x0);
-	outb(0xA1, 0x0);
-
 	set_entry(8, (uint32_t) (uint64_t) isr8, 0x08, 0x8e);
 	set_entry(13, (uint32_t) (uint64_t) isr13, 0x08, 0x8e);
 	set_entry(14, (uint32_t) (uint64_t) isr14, 0x08, 0x0e);
 
-	idt_flush((uint32_t) (uint64_t) &idt_entries);
+	idt_flush((uint32_t) (uint64_t) &idt_ptr);
 }
 
 static void set_entry(uint8_t i, uint32_t base, uint16_t sel, uint8_t flags)
@@ -88,5 +77,5 @@ static void set_entry(uint8_t i, uint32_t base, uint16_t sel, uint8_t flags)
 
 	entry->sel   = sel;
 	entry->zero  = 0;
-	entry->flags = flags | 0x60;
+	entry->flags = flags;
 }

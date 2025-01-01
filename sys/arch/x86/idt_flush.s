@@ -13,7 +13,7 @@
 
 /*
 	AUTHOR: gimura2022 <gimura0001@gmail.com>
-	DATE  : 31.12.2024
+	DATE  : 1.1.2025
 	FILE  : sys/arch/x86/idt_flush.s
 
 	flush IDT
@@ -23,5 +23,5 @@
 .text
 idt_flush:
 	movl 4(%esp), %eax
-	lidt (%eax)
+	lidtl (%eax)
 	ret
