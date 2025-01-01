@@ -13,7 +13,7 @@
 
 /*
 	AUTHOR: gimura2022 <gimura0001@gmail.com>
-	DATE  : 31.12.2024
+	DATE  : 1.1.2025
 	FILE  : sys/main.c
 
 	main kernel file
@@ -27,15 +27,19 @@
 #include <vnix/kio.h>
 #include <vnix/heap.h>
 #include <vnix/fs.h>
+#include <vnix/vmm_owned.h>
 
 void kernel_entry(struct multiboot* args)
 {
+	kputs("Kernel build at " __DATE__ " " __TIME__ ".\n");
+
+	kputs("Initing owned vmm...");
+	vmm_owned_init();
+	kok();
+
 	kputs("Initing heap...");
 	heap_init(vmm_get_page_by_addr(args->mem_upper * 1024) - 1);
 	kok();
-
-	kputs("Base initing complete!\n");
-	kputs("Kernel build at " __DATE__ " " __TIME__ ".\n");
 
 	kputs("Initing fs...");
 	fs_init();
