@@ -13,7 +13,7 @@
 
 /*
 	AUTHOR: gimura2022 <gimura0001@gmail.com>
-	DATE  : 31.12.2024
+	DATE  : 2.1.2025
 	FILE  : sys/arch_faluts.c
 
 	arch independent realisatinon for errors setuped in arch dependent code
@@ -22,18 +22,14 @@
 #include <vnix/arch_faluts.h>
 #include <vnix/halt.h>
 #include <vnix/vga.h>
+#include <vnix/panic.h>
 
 void falut_double_falut(void* _)
 {
-	halt();
+	panic("Double falut!\n");
 }
 
 void falut_general_protection_falut(void* _)
 {
-	halt();
-}
-
-void falut_page_falut(void* _)
-{
-	halt();
+	panic("General protection falut!\n");
 }

@@ -13,13 +13,12 @@
 
 /*
 	AUTHOR: gimura2022 <gimura0001@gmail.com>
-	DATE  : 31.12.2024
+	DATE  : 2.1.2025
 	FILE  : sys/arch/x86/main.c
 
 	main arch dependent entry
 */
 
-#include <arch/tss.h>
 #include <arch/gdt.h>
 #include <arch/idt.h>
 
@@ -36,6 +35,8 @@ extern void kernel_entry(struct multiboot* header);
 
 void arch_entry(struct multiboot* header)
 {
+	interrput_set(8, falut_double_falut);
+
 	vga_init_term(80);
 	kputs("Booting vnix.\n");
 
@@ -45,26 +46,13 @@ void arch_entry(struct multiboot* header)
 	kputs(num);
 	kputs(" bytes memory.\n");
 
-	kputs("Initing TSS...");
-	tss_init();
-	kok();
-
 	kputs("Initing GDT...");
 	gdt_init();
+	interrput_set(13, falut_general_protection_falut);
 	kok();
 
 	kputs("Initing IDT...");
 	idt_init();
-	kok();
-
-	kputs("Setting up insterrputs...");
-	interrput_set(8, falut_double_falut);
-	interrput_set(13, falut_general_protection_falut);
-	interrput_set(14, falut_page_falut);
-	kok();
-
-	kputs("Initing paging...");
-	vmm_init(header->mem_upper * 1024);
 	kok();
 
 	kputs("Going to kernel.\n");

@@ -3,7 +3,6 @@ include $(ROOT)/config.mk
 
 SOURCE_S = gdt_flush.s \
 	   idt_flush.s \
-	   tss_flush.s \
 	   isr_int.s
 
 SOURCE_C = asm.c \
@@ -12,8 +11,6 @@ SOURCE_C = asm.c \
 	   idt.c \
 	   interrput.c \
 	   isr.c \
-	   tss.c \
-	   vmm.c \
 	   cpu_flags.c \
 	   main.c
 

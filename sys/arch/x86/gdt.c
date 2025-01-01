@@ -13,7 +13,7 @@
 
 /*
 	AUTHOR: gimura2022 <gimura0001@gmail.com>
-	DATE  : 31.12.2024
+	DATE  : 2.1.2025
 	FILE  : sys/arch/x86/gdt.c
 
 	work with Global Descriptor Table
@@ -23,11 +23,10 @@
 #include <stddef.h>
 
 #include <arch/gdt.h>
-#include <arch/tss.h>
 
 #include <vnix/kerneldef.h>
 
-#define GDT_ENTRY_COUNT 6
+#define GDT_ENTRY_COUNT 4
 
 struct gdt_entry {
 	uint16_t limit_low;
@@ -64,11 +63,7 @@ void gdt_init(void)
 	set_entry(3, 0, 0xffffffff, 0xfa, 0xcf);
 	set_entry(4, 0, 0xffffffff, 0xf2, 0xcf);
 
-	set_entry(5, tss_addr.base, tss_addr.limit, 0xe9, 0x00);
-	set_entry(6, 0, 0xffffffff, 0x80, 0xcf);
-
 	gdt_flush((uint32_t) (uint64_t) &gdt_ptr);
-	//tss_flush();
 }
 
 static void set_entry(size_t i, uint32_t base, uint32_t limit, uint8_t access, uint8_t granularity)
