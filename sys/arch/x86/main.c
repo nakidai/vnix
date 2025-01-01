@@ -54,6 +54,5 @@ void arch_entry(struct multiboot* header)
 	idt_init();
 	kok();
 
-	kputs("Going to kernel.\n");
 	kernel_entry(header);
 }
