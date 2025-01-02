@@ -37,9 +37,6 @@ void fs_init(void)
 	kmemset(fses, 0, sizeof(fses));
 	root = rootfs_init();
 
-	kok();
-
-	if (!fs_mkdir(root, "dev", 0)) panic("Can't create /dev/ directory!\n");
 }
 
 bool fs_mkdir(struct fs_node* node, const char* name, uint32_t flags)
@@ -101,4 +98,9 @@ int fs_get_node_path(struct fs_node* node, char* buf, size_t size)
 	kstrcpy(buf, target_path + char_index);
 
 	return len;
+}
+
+struct fs_node* fs_get_root(void)
+{
+	return root;
 }
