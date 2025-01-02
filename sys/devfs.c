@@ -53,6 +53,7 @@ void devfs_init(void)
 		panic("Directory /dev/ not exsists.\n");
 
 	dev->mount_point = dev_root;
+	dev->node_type  |= FSFT_MOUNT_POINT;
 	dev_root->parent = dev->parent;
 	kstrcpy(dev_root->name, dev->name);
 
@@ -73,6 +74,8 @@ struct fs_node* devfs_add_device(struct device* device)
 
 	struct fs_node* node = kmalloc(sizeof(struct fs_node));
 	kmemset(node, 0, sizeof(struct fs_node));
+
+	kstrcpy(node->name, device->name);
 
 	node->node_type	= device->type;
 	

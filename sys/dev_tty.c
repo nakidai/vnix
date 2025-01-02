@@ -57,7 +57,7 @@ struct fs_node* tty_create_dev(int num, struct terminal* terminal)
 
 	struct device device = {0};
 	kstrcpy(device.name, "tty");
-	kstrcpy(device.name + 4, kitoa(num, buf, 10));
+	kstrcpy(device.name + 3, kitoa(num, buf, 10));
 
 	device.open  = open;
 	device.close = close;
@@ -129,7 +129,7 @@ static int32_t write(struct fs_file* file, uint32_t size, uint8_t* buf)
 
 static void write_to_term_buf(struct terminal* term, char c)
 {
-	if (term->buf_pos == term->w * term->h) {
+	if (term->buf_pos != term->w * term->h) {
 		term->buf[term->buf_pos++] = c;
 		return;
 	}
@@ -154,9 +154,14 @@ static void putchar_term(struct terminal* term, char c)
 		term->set_cursor(term->x, term->y);
 
 		break;
+	
+	case '\0':
+		break;
 
 	default:
 		term->putchar(c);
+		term->x++;
+		term->set_cursor(term->x, term->y);
 
 		break;
 	}

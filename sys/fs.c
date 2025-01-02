@@ -36,7 +36,6 @@ void fs_init(void)
 {
 	kmemset(fses, 0, sizeof(fses));
 	root = rootfs_init();
-
 }
 
 bool fs_mkdir(struct fs_node* node, const char* name, uint32_t flags)

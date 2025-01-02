@@ -69,6 +69,8 @@ void dev_console_init(void)
 
 void dev_console_set_tty(uint32_t num)
 {
+	crnt_tty = num;
+
 	struct terminal* terminal_old = ttys[crnt_tty]->private_node_data;
 	struct terminal* terminal_new = ttys[num]->private_node_data;
 	
@@ -80,6 +82,8 @@ void dev_console_set_tty(uint32_t num)
 
 static bool open(struct fs_file* file, uint32_t flags)
 {
+	file->node = ttys[crnt_tty];
+
 	return true;
 }
 
@@ -91,12 +95,28 @@ static int32_t read(struct fs_file* file, uint32_t size, uint8_t* buf)
 {
 	struct fs_node* tty = ttys[crnt_tty];
 
-	return tty->read(file, size, buf);
+	struct fs_file tty_file = {
+		.node         = tty,
+		.fd           = 0,
+		.flags        = 0,
+		.offset       = 0,
+		.private_data = 0,
+	};
+
+	return tty->read(&tty_file, size, buf);
 }
 
 static int32_t write(struct fs_file* file, uint32_t size, uint8_t* buf)
 {
 	struct fs_node* tty = ttys[crnt_tty];
 
-	return tty->write(file, size, buf);
+	struct fs_file tty_file = {
+		.node         = tty,
+		.fd           = 0,
+		.flags        = 0,
+		.offset       = 0,
+		.private_data = 0,
+	};
+
+	return tty->write(&tty_file, size, buf);
 }
