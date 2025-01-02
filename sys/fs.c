@@ -13,7 +13,7 @@
 
 /*
 	AUTHOR: gimura2022 <gimura0001@gmail.com>
-	DATE  : 2.1.2025
+	DATE  : 3.1.2025
 	FILE  : sys/fs.c
 
 	file system realisation
@@ -105,4 +105,20 @@ struct fs_node* fs_finddir(struct fs_node* node, const char* name)
 struct fs_node* fs_get_root(void)
 {
 	return root;
+}
+
+int32_t fs_read(struct fs_file* file, uint32_t size, uint8_t* buf)
+{
+	if (file->node->read != NULL)
+		return file->node->read(file, size, buf);
+
+	return -1;
+}
+
+int32_t fs_write(struct fs_file* file, uint32_t size, uint8_t* buf)
+{
+	if (file->node->write != NULL)
+		return file->node->write(file, size, buf);
+
+	return -1;
 }

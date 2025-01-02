@@ -13,7 +13,7 @@
 
 /*
 	AUTHOR: gimura2022 <gimura0001@gmail.com>
-	DATE  : 2.1.2025
+	DATE  : 3.1.2025
 	FILE  : sys/include/vnix/fs.h
 
 	file system realisation
@@ -150,9 +150,12 @@ struct fs_dirent {
 void fs_init(void);
 
 bool fs_mkdir(struct fs_node* node, const char* name, uint32_t flags);
-int fs_get_node_path(struct fs_node* node, char* buf, size_t size);
 struct fs_node* fs_finddir(struct fs_node* node, const char* name);
 
+int fs_get_node_path(struct fs_node* node, char* buf, size_t size);
 struct fs_node* fs_get_root(void);
+
+int32_t fs_read(struct fs_file* file, uint32_t size, uint8_t* buf);
+int32_t fs_write(struct fs_file* file, uint32_t size, uint8_t* buf);
 
 #endif
