@@ -30,7 +30,7 @@
 
 #include <libk/kstdmem.h>
 
-#define AREA_SIZE kb(4)
+#define AREA_SIZE (kb(4))
 
 struct alloc_entry {
 	uint32_t areas_count;
@@ -53,7 +53,7 @@ static void* get_entry_mem(struct alloc_entry* entry);
 
 void* kmalloc(size_t size)
 {
-	uint32_t areas            = size / AREA_SIZE + 1;
+	uint32_t areas            = (size / AREA_SIZE) + 1;
 	struct alloc_entry* entry = add_region(areas);
 
 	if (entry == NULL)
@@ -84,11 +84,12 @@ static struct alloc_entry* add_region(uint32_t areas)
 	struct alloc_entry* separing_entry = NULL;
 	struct alloc_entry* new_entry      = NULL;
 	int separing_entry_id              = 0;
+	struct alloc_entry buf[HEAP_MAX_ALLOC_ENTRIES];
 
 	for (int i = 0; i < alloc_entries_count; i++) {
 		struct alloc_entry* entry = &alloc_entries[i];
 
-		if (entry->areas_count <= areas && entry->is_free) {
+		if (areas <= entry->areas_count && entry->is_free) {
 			separing_entry    = entry;
 			separing_entry_id = i;
 
@@ -102,7 +103,10 @@ static struct alloc_entry* add_region(uint32_t areas)
 	if (alloc_entries_count + 1 >= HEAP_MAX_ALLOC_ENTRIES)
 		return NULL;
 
-	kmemcpy(&alloc_entries[separing_entry_id + 1], &alloc_entries[separing_entry_id],
+	kmemcpy(buf, &alloc_entries[separing_entry_id],
+			sizeof(struct alloc_entry) * (alloc_entries_count - separing_entry_id));
+
+	kmemcpy(&alloc_entries[separing_entry_id + 1], buf,
 			sizeof(struct alloc_entry) * (alloc_entries_count - separing_entry_id));
 
 	alloc_entries_count++;
