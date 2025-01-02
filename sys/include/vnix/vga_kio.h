@@ -14,7 +14,7 @@
 /*
 	AUTHOR: gimura2022 <gimura0001@gmail.com>
 	DATE  : 2.1.2025
-	FILE  : sys/include/vnix/vga.h
+	FILE  : sys/include/vnix/vga_kio.h
 
 	vga interface for kernel io
 */
