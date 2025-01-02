@@ -13,7 +13,7 @@
 
 /*
 	AUTHOR: gimura2022 <gimura0001@gmail.com>
-	DATE  : 31.12.2024
+	DATE  : 2.1.2025
 	FILE  : sys/panic.c
 
 	kernel panic function
@@ -23,9 +23,13 @@
 #include <vnix/kio.h>
 #include <vnix/halt.h>
 
-void panic(const char* msg)
+void __panic(const char* msg, const char* file, const char* line)
 {
-	kputs("Kernel paniced: ");
+	kputs("Kernel paniced at ");
+	kputs(file);
+	kputs(":");
+	kputs(line);
+	kputs(":");
 	kputs(msg);
 
 	halt();

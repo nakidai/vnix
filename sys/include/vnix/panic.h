@@ -13,7 +13,7 @@
 
 /*
 	AUTHOR: gimura2022 <gimura0001@gmail.com>
-	DATE  : 31.12.2024
+	DATE  : 2.1.2025
 	FILE  : sys/include/vnix/panic.h
 
 	kernel panic function
@@ -22,6 +22,8 @@
 #ifndef _vnix_panic_h
 #define _vnix_panic_h
 
-void panic(const char* msg);
+#define panic(x) __panic(msg, __FILE__, __LINE__)
+
+void __panic(const char* msg, const char* file, const char* line);
 
 #endif
