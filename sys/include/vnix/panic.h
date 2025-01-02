@@ -22,8 +22,8 @@
 #ifndef _vnix_panic_h
 #define _vnix_panic_h
 
-#define panic(x) __panic(msg, __FILE__, __LINE__)
+#define panic(x) __panic(x, __FILE__, __LINE__)
 
-void __panic(const char* msg, const char* file, const char* line);
+void __panic(const char* msg, const char* file, int line);
 
 #endif

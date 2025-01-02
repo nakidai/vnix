@@ -23,13 +23,17 @@
 #include <vnix/kio.h>
 #include <vnix/halt.h>
 
-void __panic(const char* msg, const char* file, const char* line)
+#include <libk/itoa.h>
+
+void __panic(const char* msg, const char* file, int line)
 {
+	char buf[128];
+
 	kputs("Kernel paniced at ");
 	kputs(file);
 	kputs(":");
-	kputs(line);
-	kputs(":");
+	kputs(kitoa(line, buf, 10));
+	kputs(" : ");
 	kputs(msg);
 
 	halt();

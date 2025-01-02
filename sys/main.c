@@ -26,6 +26,7 @@
 #include <vnix/kio.h>
 #include <vnix/heap.h>
 #include <vnix/fs.h>
+#include <vnix/panic.h>
 
 void kernel_entry(struct multiboot* args)
 {
@@ -38,7 +39,7 @@ void kernel_entry(struct multiboot* args)
 	kok();
 
 	kputs("Creating /dev/...");
-	if (!fs_mkdir(root, "dev", 0))
+	if (!fs_mkdir(fs_get_root(), "dev", 0))
 		panic("Can't create /dev/ directory!\n");
 	kok();
 
