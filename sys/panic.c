@@ -27,14 +27,6 @@
 
 void __panic(const char* msg, const char* file, int line)
 {
-	char buf[128];
-
-	kputs("Kernel paniced at ");
-	kputs(file);
-	kputs(":");
-	kputs(kitoa(line, buf, 10));
-	kputs(" : ");
-	kputs(msg);
-
+	kprintf("Kernel paniced at %s:%i : %s", file, line, msg);
 	halt();
 }
