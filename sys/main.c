@@ -35,6 +35,12 @@ void kernel_entry(struct multiboot* args)
 
 	kputs("Fs initing...");
 	fs_init();
+	kok();
+
+	kputs("Creating /dev/...");
+	if (!fs_mkdir(root, "dev", 0))
+		panic("Can't create /dev/ directory!\n");
+	kok();
 
 	kputs("Kernel build at " __DATE__ " " __TIME__ ".\n");
 	halt();
