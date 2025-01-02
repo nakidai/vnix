@@ -41,16 +41,6 @@ void fs_init(void)
 
 bool fs_mkdir(struct fs_node* node, const char* name, uint32_t flags)
 {
-	char buf[128] = {0};
-	if (fs_get_node_path(node, buf, sizeof(buf)) == -1)
-		panic("Invalid node in mkdir!\n");
-
-	kputs("Creating directory ");
-	kputs(buf);
-	kputs(name);
-	kputs("/");
-	kputs("\n");
-
 	if ((node->node_type & FSFT_MOUNT_POINT) == FSFT_MOUNT_POINT && node->mount_point != NULL &&
 			node->mount_point->mkdir != NULL)
 		return node->mount_point->mkdir(node->mount_point, name, flags);
