@@ -14,43 +14,40 @@
 /*
 	AUTHOR: gimura2022 <gimura0001@gmail.com>
 	DATE  : 2.1.2025
-	FILE  : sys/main.c
+	FILE  : sys/include/vnix/dev_tty.h
 
-	main kernel file
+	tty device and terminal subsystem
 */
 
-#include <vnix/multiboot.h>
-#include <vnix/halt.h>
-#include <vnix/interrput.h>
-#include <vnix/mem_table.h>
-#include <vnix/kio.h>
-#include <vnix/heap.h>
+#ifndef _vnix_dev_tty_h
+#define _vnix_dev_tty_h
+
+#include <stdint.h>
+#include <stdbool.h>
+
 #include <vnix/fs.h>
-#include <vnix/panic.h>
-#include <vnix/devfs.h>
-#include <vnix/dev_console.h>
 
-void kernel_entry(struct multiboot* args)
-{
-	kputs("Heap initing...");
-	heap_init(kb(args->mem_upper));
-	kok();
+typedef void (*tty_putchar_f)(char c);
+typedef char (*tty_getchar_f)(void);
+typedef void (*tty_clear_f)(void);
+typedef void (*tty_set_cursor)(uint32_t, uint32_t);
 
-	kputs("Fs initing...");
-	fs_init();
-	kok();
+struct terminal {
+	uint32_t w, h;
+	uint32_t x, y;
 
-	kputs("Creating /dev/...");
-	if (!fs_mkdir(fs_get_root(), "dev", 0))
-		panic("Can't create /dev/ directory!\n");
-	kok();
+	uint32_t buf_pos;
+	char* buf;
 
-	kputs("Devfs initing...");
-	devfs_init();
-	kok();
+	tty_putchar_f putchar;
+	tty_getchar_f getchar;
+	tty_clear_f clear;
+	tty_set_cursor set_cursor;
 
-	dev_console_init();
+	bool is_active;
+};
 
-	kputs("Kernel build at " __DATE__ " " __TIME__ ".\n");
-	halt();
-}
+void tty_create(struct terminal* terminal, uint32_t width, uint32_t height);
+struct fs_node* tty_create_dev(int num, struct terminal* terminal);
+
+#endif

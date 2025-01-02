@@ -12,7 +12,9 @@ C_SOURCE = main.c \
 	   fs.c \
 	   rootfs.c \
 	   devfs.c \
-	   vga_kio.c
+	   vga_kio.c \
+	   dev_tty.c \
+	   dev_console.c
 
 C_OBJECTS = $(C_SOURCE:.c=.o)
 
