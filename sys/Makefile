@@ -14,7 +14,8 @@ C_SOURCE = main.c \
 	   devfs.c \
 	   vga_kio.c \
 	   dev_tty.c \
-	   dev_console.c
+	   dev_console.c \
+	   vga_term.c
 
 C_OBJECTS = $(C_SOURCE:.c=.o)
 

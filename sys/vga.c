@@ -13,7 +13,7 @@
 
 /*
 	AUTHOR: gimura2022 <gimura0001@gmail.com>
-	DATE  : 2.1.2025
+	DATE  : 3.1.2025
 	FILE  : sys/vga.c
 
 	vga interface
@@ -50,6 +50,16 @@ void vga_set_cursor_visible(bool visible)
 
 void vga_add_char(char c, uint8_t color)
 {
+	if ((crnt_y * VGA_WIDTH + crnt_x) * 2 == VGA_WIDTH * VGA_HEIGHT * 2) {
+		char buf[VGA_WIDTH * (VGA_HEIGHT - 1) * 2];
+		kmemcpy(buf, &vga[VGA_WIDTH * 2], VGA_WIDTH * (VGA_HEIGHT - 1) * 2);
+		kmemcpy(vga, buf, VGA_WIDTH * (VGA_HEIGHT - 1) * 2);
+
+		kmemset(&vga[(VGA_HEIGHT - 1) * VGA_WIDTH * 2], 0, VGA_WIDTH * 2);
+
+		crnt_y--;
+	}
+
 	vga[(crnt_y * VGA_WIDTH + crnt_x) * 2]     = c;
 	vga[(crnt_y * VGA_WIDTH + crnt_x) * 2 + 1] = color;
 }

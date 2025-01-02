@@ -13,7 +13,7 @@
 
 /*
 	AUTHOR: gimura2022 <gimura0001@gmail.com>
-	DATE  : 2.1.2025
+	DATE  : 3.1.2025
 	FILE  : sys/include/vnix/dev_tty.h
 
 	tty device and terminal subsystem
@@ -49,5 +49,7 @@ struct terminal {
 
 void tty_create(struct terminal* terminal, uint32_t width, uint32_t height);
 struct fs_node* tty_create_dev(int num, struct terminal* terminal);
+
+void tty_switch(struct terminal* term);
 
 #endif

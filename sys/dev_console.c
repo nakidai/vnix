@@ -13,7 +13,7 @@
 
 /*
 	AUTHOR: gimura2022 <gimura0001@gmail.com>
-	DATE  : 2.1.2025
+	DATE  : 3.1.2025
 	FILE  : sys/dev_console.c
 
 	console device
@@ -28,6 +28,7 @@
 #include <vnix/heap.h>
 #include <vnix/kio.h>
 #include <vnix/devfs.h>
+#include <vnix/vga_term.h>
 
 #include <libk/kstring.h>
 
@@ -44,7 +45,7 @@ void dev_console_init(void)
 {
 	for (int i = 0; i < DEV_CONSOLE_TTY_COUNT; i++) {
 		struct terminal* term = kmalloc(sizeof(struct terminal));
-		// vga tty init
+		vga_term(term);
 		ttys[i] = tty_create_dev(i, term);
 	}
 
@@ -73,6 +74,7 @@ void dev_console_set_tty(uint32_t num)
 	
 	terminal_old->is_active = false;
 	terminal_new->is_active = true;
+
 }
 
 static bool open(struct fs_file* file, uint32_t flags)

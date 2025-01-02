@@ -13,7 +13,7 @@
 
 /*
 	AUTHOR: gimura2022 <gimura0001@gmail.com>
-	DATE  : 2.1.2025
+	DATE  : 3.1.2025
 	FILE  : sys/dev_tty.c
 
 	tty device and terminal subsystem
@@ -39,6 +39,7 @@ void tty_create(struct terminal* terminal, uint32_t width, uint32_t height)
 	terminal->h = height;
 
 	terminal->buf = kmalloc(width * height);
+	kmemset(terminal->buf, 0, width * height);
 }
 
 static bool open(struct fs_file* file, uint32_t flags);
@@ -73,6 +74,17 @@ struct fs_node* tty_create_dev(int num, struct terminal* terminal)
 	return node;
 }
 
+static void write_to_term_buf(struct terminal* term, char c);
+static void putchar_term(struct terminal* term, char c);
+
+void tty_switch(struct terminal* term)
+{
+	term->clear();
+
+	for (int i = 0; i < term->buf_pos; i++)
+		putchar_term(term, term->buf[i]);	
+}
+
 static bool open(struct fs_file* file, uint32_t flags)
 {
 	return true;
@@ -81,9 +93,6 @@ static bool open(struct fs_file* file, uint32_t flags)
 static void close(struct fs_file* file)
 {
 }
-
-static void write_to_term_buf(struct terminal* term, char c);
-static void putchar_term(struct terminal* term, char c);
 
 static int32_t read(struct fs_file* file, uint32_t size, uint8_t* buf)
 {
