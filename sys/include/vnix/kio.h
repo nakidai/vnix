@@ -13,7 +13,7 @@
 
 /*
 	AUTHOR: gimura2022 <gimura0001@gmail.com>
-	DATE  : 31.12.2024
+	DATE  : 3.1.2025
 	FILE  : sys/include/vnix/kio.h
 
 	kernel IO
@@ -28,6 +28,8 @@ void kio_set(kio_putc_f puter);
 
 void kputc(char c);
 void kputs(const char* s);
+
+void kprintf(const char* fmt, ...);
 
 void kok(void);
 void kerr(const char* msg);

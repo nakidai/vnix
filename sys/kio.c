@@ -13,13 +13,19 @@
 
 /*
 	AUTHOR: gimura2022 <gimura0001@gmail.com>
-	DATE  : 31.12.2024
+	DATE  : 3.1.2025
 	FILE  : sys/kio.c
 
 	kernel IO
 */
 
+#include <stdarg.h>
+#include <stdbool.h>
+#include <stdint.h>
+
 #include <vnix/kio.h>
+
+#include <libk/itoa.h>
 
 #define MSG_OFFSET 40
 
@@ -39,6 +45,40 @@ void kputs(const char* s)
 {
 	for (const char* c = s; *c != '\0'; c++)
 		puter(*c);
+}
+
+void kprintf(const char* fmt, ...)
+{
+	va_list list;
+	va_start(list, fmt);
+
+	bool format = false;
+	char num_buf[128];
+
+	for (const char* c = fmt; *c != '\0'; c++) {
+		if (*c == '%') {
+			format = true;
+			continue;
+		}
+
+		if (format) switch (*c) {
+		case 's':
+			kputs(va_arg(list, const char*));
+			continue;
+
+		case 'i':
+			kputs(kitoa(va_arg(list, int32_t), num_buf, 10));		
+			continue;
+
+		case 'u':
+			kputs(kitoa(va_arg(list, uint32_t), num_buf, 10));
+			continue;
+		}
+
+		kputc(*c);
+	}
+
+	va_end(list);
 }
 
 static void off_msg(const char* msg);
