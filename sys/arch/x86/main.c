@@ -13,7 +13,7 @@
 
 /*
 	AUTHOR: gimura2022 <gimura0001@gmail.com>
-	DATE  : 2.1.2025
+	DATE  : 3.1.2025
 	FILE  : sys/arch/x86/main.c
 
 	main arch dependent entry
@@ -28,6 +28,7 @@
 #include <vnix/vga.h>
 #include <vnix/kio.h>
 #include <vnix/vga_kio.h>
+#include <vnix/mem_table.h>
 
 #include <libk/itoa.h>
 
@@ -39,12 +40,7 @@ void arch_entry(struct multiboot* header)
 
 	vga_kio_init();
 	kputs("Booting vnix.\n");
-
-	char num[128] = {0};
-	kitoa(header->mem_upper * 1024, num, 10);
-	kputs("Avalidabe ");
-	kputs(num);
-	kputs(" bytes memory.\n");
+	kprintf("Avalidabe %u bytes memory.\n", kb(header->mem_upper));
 
 	kputs("Initing GDT...");
 	gdt_init();

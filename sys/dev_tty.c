@@ -51,9 +51,7 @@ struct fs_node* tty_create_dev(int num, struct terminal* terminal)
 {
 	char buf[128];
 
-	kputs("Creating /dev/tty");
-	kputs(kitoa(num, buf, 10));
-	kputs("...");
+	kprintf("Creating /dev/tty%i...", num);
 
 	struct device device = {0};
 	kstrcpy(device.name, "tty");
