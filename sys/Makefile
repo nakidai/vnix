@@ -11,7 +11,8 @@ C_SOURCE = main.c \
 	   heap.c \
 	   fs.c \
 	   rootfs.c \
-	   devfs.c
+	   devfs.c \
+	   vga_kio.c
 
 C_OBJECTS = $(C_SOURCE:.c=.o)
 

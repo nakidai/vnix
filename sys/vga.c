@@ -13,7 +13,7 @@
 
 /*
 	AUTHOR: gimura2022 <gimura0001@gmail.com>
-	DATE  : 31.12.2024
+	DATE  : 2.1.2025
 	FILE  : sys/vga.c
 
 	vga interface
@@ -23,65 +23,56 @@
 
 #include <vnix/vga.h>
 #include <vnix/kio.h>
+#include <vnix/port_io.h>
 
 #include <libk/kstdmem.h>
-
-static uint32_t term_size;
 
 static char* vga = (char*) 0xb8000;
 
 static uint32_t crnt_x = 0;
 static uint32_t crnt_y = 0;
 
-void vga_init(uint32_t size)
-{
-	term_size = size;
-	vga_clear();
-}
-
-static void vga_kio_handler(char c);
-
-void vga_init_term(uint32_t size)
-{
-	vga_init(size);
-	kio_set(vga_kio_handler);
-}
-
-static void vga_kio_handler(char c)
-{
-	if (crnt_x >= term_size) {
-		crnt_x = 0;
-		crnt_y++;
-	}
-
-	switch (c) {
-	case '\n':
-		vga_kio_handler('\r');
-		crnt_y++;
-
-		return;
-	
-	case '\r':
-		crnt_x = 0;
-
-		return;
-
-	case '\?':
-		crnt_x++;
-
-		return;
-
-	default:
-		vga[(crnt_y * term_size + crnt_x) * 2]       = c;
-		vga[((crnt_y * term_size + crnt_x) * 2) + 1] = 0x07;
-
-		break;
-	}
-
-	crnt_x++;
-}
-
 void vga_clear(void)
 {
-	kmemset(vga, 0, 25 * term_size * 2);
+	kmemset(vga, 0, VGA_WIDTH * VGA_HEIGHT * 2);
+	crnt_x = 0;
+	crnt_y = 0;
+}
+
+void vga_set_cursor_visible(bool visible)
+{
+	uint8_t cursor = inb(0x3d5);
+
+	cursor = visible ? cursor & ~0x20 : cursor | 0x20;
+
+	outb(0x3d5, cursor);
+}
+
+void vga_add_char(char c, uint8_t color)
+{
+	vga[(crnt_y * VGA_WIDTH + crnt_x) * 2]     = c;
+	vga[(crnt_y * VGA_WIDTH + crnt_x) * 2 + 1] = color;
+}
+
+void vga_move_cursor(uint32_t x, uint32_t y)
+{
+	uint16_t cursor_loc = y * VGA_WIDTH + x;
+
+	outb(0x3d4, 14);
+	outb(0x3d5, cursor_loc >> 8);
+	outb(0x3d4, 15);
+	outb(0x3d5, cursor_loc);
+
+	crnt_x = x;
+	crnt_y = y;
+}
+
+uint32_t vga_get_cursor_x(void)
+{
+	return crnt_x;
+}
+
+uint32_t vga_get_cursor_y(void)
+{
+	return crnt_y;
 }

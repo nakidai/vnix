@@ -43,6 +43,36 @@ void outw(uint16_t port, uint16_t value)
 	);
 }
 
+uint8_t inb(uint16_t port)
+{
+	uint8_t value;
+	
+	asm volatile(
+		"inb %1, %0"
+		:
+		"=a" (value)
+		:
+		"dN" (port)
+	);
+
+	return value;
+}
+
+uint16_t ibw(uint16_t port)
+{
+	uint16_t value;
+	
+	asm volatile(
+		"inw %1, %0"
+		:
+		"=a" (value)
+		:
+		"dN" (port)
+	);
+
+	return value;
+}
+
 void set_cr0(uint32_t value)
 {
 	asm volatile(

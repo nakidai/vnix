@@ -13,28 +13,21 @@
 
 /*
 	AUTHOR: gimura2022 <gimura0001@gmail.com>
-	DATE  : 2.1.2025
-	FILE  : sys/include/vnix/vga.h
+	DATE  : 31.12.2024
+	FILE  : sys/include/vnix/port_io.h
 
-	vga interface
+	port io
 */
 
-#ifndef _vnix_vga_h
-#define _vnix_vga_h
+#ifndef _vnix_port_io_h
+#define _vnix_port_io_h
 
-#include <stdbool.h>
 #include <stdint.h>
 
-#define VGA_WIDTH 80
-#define VGA_HEIGHT 25
+void outb(uint16_t port, uint8_t value);
+void outw(uint16_t port, uint16_t value);
 
-void vga_clear(void);
-
-void vga_set_cursor_visible(bool visible);
-void vga_add_char(char c, uint8_t color);
-
-void vga_move_cursor(uint32_t x, uint32_t y);
-uint32_t vga_get_cursor_x(void);
-uint32_t vga_get_cursor_y(void);
+uint8_t inb(uint16_t port);
+uint16_t ibw(uint16_t port);
 
 #endif

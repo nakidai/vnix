@@ -29,6 +29,9 @@
 void outb(uint16_t port, uint8_t value);
 void outw(uint16_t port, uint16_t value);
 
+uint8_t inb(uint16_t port);
+uint16_t ibw(uint16_t port);
+
 void set_cr0(uint32_t value);
 void set_cr3(uint32_t value);
 

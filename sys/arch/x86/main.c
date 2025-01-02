@@ -27,6 +27,7 @@
 #include <vnix/interrput.h>
 #include <vnix/vga.h>
 #include <vnix/kio.h>
+#include <vnix/vga_kio.h>
 
 #include <libk/itoa.h>
 
@@ -36,7 +37,7 @@ void arch_entry(struct multiboot* header)
 {
 	interrput_set(8, falut_double_falut);
 
-	vga_init_term(80);
+	vga_kio_init();
 	kputs("Booting vnix.\n");
 
 	char num[128] = {0};
