@@ -49,7 +49,7 @@ void dev_console_init(void)
 		ttys[i] = tty_create_dev(i, term);
 	}
 
-	dev_console_set_tty(0);
+	((struct terminal*) ttys[crnt_tty]->private_node_data)->is_active = true;
 
 	kputs("Creating /dev/console...");
 
@@ -75,6 +75,7 @@ void dev_console_set_tty(uint32_t num)
 	terminal_old->is_active = false;
 	terminal_new->is_active = true;
 
+	tty_switch(terminal_new);
 }
 
 static bool open(struct fs_file* file, uint32_t flags)
