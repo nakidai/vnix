@@ -151,6 +151,7 @@ void fs_init(void);
 
 bool fs_mkdir(struct fs_node* node, const char* name, uint32_t flags);
 int fs_get_node_path(struct fs_node* node, char* buf, size_t size);
+struct fs_node* fs_finddir(struct fs_node* node, const char* name);
 
 struct fs_node* fs_get_root(void);
 

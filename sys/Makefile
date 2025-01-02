@@ -10,7 +10,8 @@ C_SOURCE = main.c \
 	   vga.c \
 	   heap.c \
 	   fs.c \
-	   rootfs.c
+	   rootfs.c \
+	   devfs.c
 
 C_OBJECTS = $(C_SOURCE:.c=.o)
 

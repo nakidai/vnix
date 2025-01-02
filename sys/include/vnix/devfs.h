@@ -14,40 +14,46 @@
 /*
 	AUTHOR: gimura2022 <gimura0001@gmail.com>
 	DATE  : 2.1.2025
-	FILE  : sys/main.c
+	FILE  : sys/include/vnix/devfs.h
 
-	main kernel file
+	dev directory file system
 */
 
-#include <vnix/multiboot.h>
-#include <vnix/halt.h>
-#include <vnix/interrput.h>
-#include <vnix/mem_table.h>
-#include <vnix/kio.h>
-#include <vnix/heap.h>
+#ifndef _vnix_devfs_h
+#define _vnix_devfs_h
+
 #include <vnix/fs.h>
-#include <vnix/panic.h>
-#include <vnix/devfs.h>
 
-void kernel_entry(struct multiboot* args)
-{
-	kputs("Heap initing...");
-	heap_init(kb(args->mem_upper));
-	kok();
+#define DEVFS_MAX_DEVICE_NAME 16
+#define DEVFS_MAX_DEVICES 256
 
-	kputs("Fs initing...");
-	fs_init();
-	kok();
+struct device {
+	char name[DEVFS_MAX_DEVICE_NAME];
 
-	kputs("Creating /dev/...");
-	if (!fs_mkdir(fs_get_root(), "dev", 0))
-		panic("Can't create /dev/ directory!\n");
-	kok();
+	enum fs_file_type type;
+	
+	read_write_block_f read_block;
+	read_write_block_f write_block;
 
-	kputs("Devfs initing...");
-	devfs_init();
-	kok();
+	read_write_f read;
+	read_write_f write;
 
-	kputs("Kernel build at " __DATE__ " " __TIME__ ".\n");
-	halt();
-}
+	read_write_test_f read_test;
+	read_write_test_f write_test;
+
+	open_f open;
+	close_f close;
+
+	ioctl_f ioctl;
+	ftrucate_f ftrucate;
+
+	mmap_f mmap;
+	munmap_f munmap;
+
+	void* private_data;
+};
+
+void devfs_init(void);
+struct fs_node* devfs_add_device(struct device* device);
+
+#endif

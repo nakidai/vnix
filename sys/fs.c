@@ -90,6 +90,18 @@ int fs_get_node_path(struct fs_node* node, char* buf, size_t size)
 	return len;
 }
 
+struct fs_node* fs_finddir(struct fs_node* node, const char* name)
+{
+	if ((node->node_type & FSFT_MOUNT_POINT) == FSFT_MOUNT_POINT && node->mount_point != NULL &&
+			node->mount_point->find_dir != NULL)
+		return node->mount_point->find_dir(node->mount_point, name);
+
+	else if ((node->node_type & FSFT_DIR) == FSFT_DIR && node->find_dir != NULL)
+		return node->find_dir(node, name);
+
+	return NULL;
+}
+
 struct fs_node* fs_get_root(void)
 {
 	return root;
