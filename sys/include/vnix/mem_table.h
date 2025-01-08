@@ -13,7 +13,6 @@
 
 /*
 	AUTHOR: gimura2022 <gimura0001@gmail.com>
-	DATE  : 31.12.2024
 	FILE  : sys/include/vnix/mem_table.h
 
 	table of memory

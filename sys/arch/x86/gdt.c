@@ -13,7 +13,6 @@
 
 /*
 	AUTHOR: gimura2022 <gimura0001@gmail.com>
-	DATE  : 2.1.2025
 	FILE  : sys/arch/x86/gdt.c
 
 	work with Global Descriptor Table

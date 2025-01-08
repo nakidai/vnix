@@ -13,7 +13,6 @@
 
 /*
 	AUTHOR: gimura2022 <gimura0001@gmail.com>
-	DATE  : 31.12.2024
 	FILE  : sys/arch/x86/include/arch/asm.h
 
 	function and macroses for using assembly in C

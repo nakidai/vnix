@@ -13,7 +13,6 @@
 
 /*
 	AUTHOR: gimura2022 <gimura0001@gmail.com>
-	DATE  : 2.1.2025
 	FILE  : sys/heap.c
 
 	hight level function for working in heap

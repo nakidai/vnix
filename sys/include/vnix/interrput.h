@@ -13,7 +13,6 @@
 
 /*
 	AUTHOR: gimura2022 <gimura0001@gmail.com>
-	DATE  : 31.12.2024
 	FILE  : sys/include/vnix/interrput.h
 
 	hight level interrput handling interface

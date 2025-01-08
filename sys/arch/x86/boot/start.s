@@ -13,7 +13,6 @@
 
 /*
 	AUTHOR: gimura2022 <gimura0001@gmail.com>
-	DATE  : 31.12.2024
 	FILE  : sys/arch/x86/boot/start.s
 
 	base runtime for other code

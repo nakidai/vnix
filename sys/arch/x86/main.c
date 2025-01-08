@@ -13,7 +13,6 @@
 
 /*
 	AUTHOR: gimura2022 <gimura0001@gmail.com>
-	DATE  : 3.1.2025
 	FILE  : sys/arch/x86/main.c
 
 	main arch dependent entry

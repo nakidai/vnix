@@ -13,7 +13,6 @@
 
 /*
 	AUTHOR: gimura2022 <gimura0001@gmail.com>
-	DATE  : 3.1.2025
 	FILE  : sys/include/vnix/dev_tty.h
 
 	tty device and terminal subsystem
