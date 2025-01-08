@@ -38,8 +38,8 @@ void isr_handle(struct isr_data data)
 {
 	uint8_t int_no = data.int_num & 0xff;
 
-//	if (isr_handlers[int_no] == NULL)
-//		panic("Interrput not found!\n");
+	if (isr_handlers[int_no] == NULL)
+		panic("Interrput not found!\n");
 
 	isr_handlers[int_no](&data);	
 }
