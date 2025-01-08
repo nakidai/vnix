@@ -13,20 +13,24 @@
 
 /*
 	AUTHOR: gimura2022 <gimura0001@gmail.com>
-	DATE  : 31.12.2024
-	FILE  : sys/arch/x86/gdt_flush.s
+	DATE  : 2.1.2025
+	FILE  : sys/include/vnix/faluts.h
 
-	flush GDT
+	processor errors realisation
 */
 
-.globl gdt_flush
-.text
-gdt_flush:
-	movl 4(%esp), %eax
+#ifndef _vnix_arch_faluts_h
+#define _vnix_arch_faluts_h
 
-	lgdt (%eax)
+#include <vnix/interrput.h>
 
-	jmp .flush
+void falut_setup_faluts(void);
 
-	.flush:
-		ret
+#define falut(func) void falut_##func##_falut(struct isr_data* regs);
+
+falut(double);
+falut(general_protection);
+
+#undef falut
+
+#endif

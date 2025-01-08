@@ -14,15 +14,17 @@
 /*
 	AUTHOR: gimura2022 <gimura0001@gmail.com>
 	DATE  : 2.1.2025
-	FILE  : sys/include/vnix/arch_faluts.h
+	FILE  : sys/include/vnix/faluts.h
 
-	arch independent realisatinon for errors setuped in arch dependent code
+	processor errors realisation
 */
 
 #ifndef _vnix_arch_faluts_h
 #define _vnix_arch_faluts_h
 
-void falut_double_falut(void* _);
-void falut_general_protection_falut(void* _);
+#include <vnix/interrput.h>
+
+void falut_double_falut(struct isr_data* regs);
+void falut_general_protection_falut(struct isr_data* regs);
 
 #endif

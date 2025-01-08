@@ -29,9 +29,15 @@
 #include <vnix/panic.h>
 #include <vnix/devfs.h>
 #include <vnix/dev_console.h>
+#include <vnix/faluts.h>
+#include <vnix/port_io.h>
 
 void kernel_entry(struct multiboot* args)
 {
+	kputs("Processor errors initing...");
+	falut_setup_faluts();
+	kok();
+
 	kputs("Heap initing...");
 	heap_init(kb(args->mem_upper));
 	kok();
@@ -52,5 +58,6 @@ void kernel_entry(struct multiboot* args)
 	dev_console_init();
 
 	kputs("Kernel build at " __DATE__ " " __TIME__ ".\n");
+
 	halt();
 }

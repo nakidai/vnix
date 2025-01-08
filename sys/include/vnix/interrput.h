@@ -24,8 +24,23 @@
 
 #include <stddef.h>
 
-typedef void (*interrput_handler_f)(void*);
+#include <vnix/kerneldef.h>
+
+struct isr_data {
+	uint32_t gs;
+	uint32_t fs;
+	uint32_t es;
+	uint32_t ds;
+	uint32_t edi, esi, ebp, esp, ebx, edx, ecx, eax;
+	uint32_t int_num;
+	uint32_t eip, cs, eflags, user_esp, ss;
+} attr_packed;
+
+typedef void (*interrput_handler_f)(struct isr_data*);
 
 void interrput_set(size_t i, interrput_handler_f handler);
+
+void interrput_enable(void);
+void interrput_disable(void);
 
 #endif

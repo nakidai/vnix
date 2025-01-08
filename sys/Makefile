@@ -4,7 +4,7 @@ include $(ROOT)/config.mk
 CPPFLAGS += -I include
 
 C_SOURCE = main.c \
-	   arch_faluts.c \
+	   faluts.c \
 	   kio.c \
 	   panic.c \
 	   vga.c \

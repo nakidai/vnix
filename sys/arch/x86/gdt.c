@@ -38,7 +38,7 @@ struct gdt_entry {
 } attr_packed;
 
 struct gdt_ptr {
-	uint32_t limit;
+	uint16_t limit;
 	uint32_t base;
 } attr_packed;
 

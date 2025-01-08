@@ -23,5 +23,5 @@
 .text
 idt_flush:
 	movl 4(%esp), %eax
-	lidtl (%eax)
+	lidt (%eax)
 	ret

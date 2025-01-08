@@ -43,12 +43,41 @@
 	.globl isr\x
 	isr\x:
 		push_regs \x
-		call handle
+		jmp handle
 .endm
 
+create_isr 0
+create_isr 1
+create_isr 2
+create_isr 3
+create_isr 4
+create_isr 5
+create_isr 6
+create_isr 7
 create_isr 8
+create_isr 9
+create_isr 10
+create_isr 11
+create_isr 12
 create_isr 13
 create_isr 14
+create_isr 15
+create_isr 16
+create_isr 17
+create_isr 18
+create_isr 19
+create_isr 20
+create_isr 21
+create_isr 22
+create_isr 23
+create_isr 24
+create_isr 25
+create_isr 26
+create_isr 27
+create_isr 28
+create_isr 29
+create_isr 30
+create_isr 31
 
 .macro pop_regs
 	popl %gs 

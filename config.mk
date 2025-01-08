@@ -18,3 +18,6 @@ CPPFLAGS = -I $(ROOT)/include
 
 %.o: %.s
 	$(AS) -o $@ $< $(ASFLAGS)
+
+%.o: %.asm
+	nasm -o $@ $< -felf -g
